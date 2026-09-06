@@ -1,62 +1,1135 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Administración | Buzón Digital</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-:root{--celeste:#8ed8f8;--celeste-claro:#eaf9ff;--azul:#12385b;--verde:#174f43;--gris:#64748b;--borde:#d7e5ed;--fondo:#f5fbfe;--rojo:#9f1d1d}
-*{box-sizing:border-box;font-family:Arial,sans-serif}body{margin:0;background:var(--fondo);color:var(--azul)}header{background:var(--azul);color:#fff;padding:24px;text-align:center}header h1{margin:0 0 6px}.container{width:min(1100px,94%);margin:24px auto}.card{background:#fff;border:1px solid var(--borde);border-radius:18px;padding:22px;margin-bottom:20px;box-shadow:0 5px 20px rgba(18,56,91,.08)}label{display:block;font-weight:bold;margin:12px 0 7px}input,textarea,select{width:100%;padding:12px;border:1px solid var(--borde);border-radius:10px;font-size:15px}textarea{min-height:110px;resize:vertical}button{border:0;border-radius:10px;padding:11px 16px;font-weight:bold;cursor:pointer}.primary{background:var(--verde);color:#fff}.secondary{background:var(--celeste);color:var(--azul)}.danger{background:#ffe7e7;color:var(--rojo)}.top{display:flex;justify-content:space-between;gap:12px;align-items:center}.hidden{display:none}.login{max-width:480px;margin:45px auto}.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.stat{background:var(--celeste-claro);padding:15px;border-radius:12px;text-align:center}.stat b{display:block;font-size:24px}.petition{border:1px solid var(--borde);border-radius:14px;padding:17px;margin:14px 0}.code{display:inline-block;background:var(--azul);color:#fff;padding:5px 8px;border-radius:7px;font-size:12px;font-weight:bold}.meta{color:var(--gris);font-size:13px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.notice{padding:11px;border-radius:9px;margin-top:10px}.ok{background:#e7f5ef;color:var(--verde)}.err{background:#fff0f0;color:var(--rojo)}.announcement{border-left:4px solid var(--verde);background:#eef8f5;padding:13px;border-radius:8px;margin:10px 0}@media(max-width:750px){.stats{grid-template-columns:repeat(2,1fr)}.top{align-items:flex-start;flex-direction:column}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buzón Digital Estudiantil</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4fbff;
+      color: #102a43;
+    }
+
+    header {
+      background: linear-gradient(135deg, #8ed8f8, #dff6ff);
+      padding: 22px 8%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      color: #082f49;
+      font-size: 25px;
+    }
+
+    header p {
+      color: #31566d;
+      margin-top: 5px;
+    }
+
+    nav a {
+      color: #082f49;
+      text-decoration: none;
+      margin-left: 18px;
+      font-weight: bold;
+    }
+
+    .hero {
+      padding: 70px 8%;
+      text-align: center;
+      background: white;
+    }
+
+    .hero h2 {
+      font-size: 42px;
+      color: #073b5c;
+      margin-bottom: 15px;
+    }
+
+    .hero p {
+      max-width: 700px;
+      margin: auto;
+      font-size: 18px;
+      color: #4d6575;
+      line-height: 1.6;
+    }
+
+    .btn {
+      border: none;
+      background: #0b5278;
+      color: white;
+      padding: 13px 22px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .btn:hover {
+      background: #073b5c;
+    }
+
+    .section {
+      padding: 50px 8%;
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .section-head {
+      margin-bottom: 25px;
+    }
+
+    .section h2 {
+      color: #073b5c;
+      margin-bottom: 8px;
+    }
+
+    .small {
+      color: #667b88;
+      font-size: 14px;
+    }
+
+    .form-card,
+    .petition-card {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 5px 20px rgba(0,0,0,.08);
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin: 15px 0 7px;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #c7dce7;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 15px;
+      background: #fbfeff;
+    }
+
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    .counter {
+      text-align: right;
+      font-size: 13px;
+      color: #687d89;
+      margin-top: 5px;
+    }
+
+    .petition-title {
+      color: #073b5c;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .petition-message {
+      margin-top: 10px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .meta {
+      color: #71838e;
+      font-size: 13px;
+      margin-top: 12px;
+    }
+
+    .status {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 6px 10px;
+      border-radius: 20px;
+      background: #dff4e8;
+      color: #185c38;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .stars {
+      margin-top: 15px;
+    }
+
+    .star {
+      cursor: pointer;
+      font-size: 22px;
+      color: #8a9aa3;
+      margin-right: 3px;
+    }
+
+    .star.active {
+      color: #e2a400;
+    }
+
+    .comments {
+      margin-top: 18px;
+      border-top: 1px solid #e1ebef;
+      padding-top: 15px;
+    }
+
+    .comment {
+      background: #f2f8fa;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    .empty {
+      text-align: center;
+      color: #738690;
+      padding: 30px;
+    }
+
+    footer {
+      background: #082f49;
+      color: white;
+      text-align: center;
+      padding: 25px;
+      margin-top: 30px;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      z-index: 1000;
+    }
+
+    .modal-box {
+      background: white;
+      max-width: 600px;
+      width: 100%;
+      border-radius: 15px;
+      padding: 30px;
+    }
+
+    .modal-box h2 {
+      color: #073b5c;
+      margin-bottom: 15px;
+    }
+
+    .modal-box ul {
+      margin: 15px 0 20px 20px;
+      line-height: 1.7;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .tracking-result {
+      margin-top: 20px;
+    }
+
+    .code {
+      background: #e8f7fd;
+      color: #073b5c;
+      padding: 8px 12px;
+      border-radius: 7px;
+      display: inline-block;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    @media (max-width: 700px) {
+      .hero h2 {
+        font-size: 32px;
+      }
+
+      header {
+        padding: 20px;
+      }
+
+      nav a {
+        margin-left: 8px;
+        font-size: 14px;
+      }
+
+      .section {
+        padding: 35px 20px;
+      }
+    }
+  </style>
 </head>
+
 <body>
-<header><h1>Panel de Administración</h1><p>Buzón Digital Estudiantil</p></header>
-<div class="container">
-<section id="loginCard" class="card login">
-<h2>Acceso de administración</h2>
-<p class="meta">Este apartado es exclusivo para el equipo administrador.</p>
-<label for="username">Usuario</label><input id="username" autocomplete="username">
-<label for="password">Contraseña</label><input id="password" type="password" autocomplete="current-password">
-<button class="primary" style="width:100%;margin-top:16px" onclick="login()">Ingresar</button>
-<div id="loginMsg"></div>
+
+<header>
+  <div>
+    <h1>Buzón Digital Estudiantil</h1>
+    <p>Tu opinión ayuda a mejorar nuestra institución</p>
+  </div>
+
+  <nav>
+    <a href="#enviar">Enviar</a>
+    <a href="#seguimiento">Seguimiento</a>
+    <a href="#peticiones">Peticiones</a>
+    <a href="#anuncios">Anuncios</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h2>Tu voz también cuenta</h2>
+  <p>
+    Este espacio permite enviar opiniones, sugerencias y peticiones
+    de manera anónima para ayudar a mejorar la institución y la
+    comunicación entre estudiantes y autoridades.
+  </p>
+
+  <button class="btn" onclick="document.getElementById('enviar').scrollIntoView()">
+    Enviar una petición
+  </button>
 </section>
 
-<main id="panel" class="hidden">
-<div class="card top"><div><h2 style="margin:0">Administración</h2><p class="meta">Gestiona peticiones, respuestas y anuncios.</p></div><button class="danger" onclick="logout()">Cerrar sesión</button></div>
-<div class="card"><h2>Resumen</h2><div class="stats" id="stats"></div></div>
-<div class="card"><h2>Publicar anuncio</h2><label for="annTitle">Título</label><input id="annTitle" maxlength="150" placeholder="Ejemplo: Reunión estudiantil">
-<label for="annContent">Contenido</label><textarea id="annContent" maxlength="3000" placeholder="Escribe el anuncio..."></textarea>
-<button class="primary" style="margin-top:12px" onclick="createAnnouncement()">Publicar anuncio</button><div id="annMsg"></div></div>
-<div class="card"><h2>Anuncios publicados</h2><div id="announcements"></div></div>
-<div class="card"><h2>Peticiones</h2><div id="petitions">Cargando...</div></div>
-</main>
+<section class="section" id="enviar">
+
+  <div class="section-head">
+    <h2>Enviar una petición</h2>
+    <div class="small">
+      Puedes enviar máximo 2 peticiones por día. El mensaje debe tener como máximo 500 palabras.
+    </div>
+  </div>
+
+  <div class="form-card">
+
+    <form id="petitionForm">
+
+      <label for="title">Título</label>
+      <input
+        id="title"
+        type="text"
+        maxlength="120"
+        required
+        placeholder="Escribe un título para tu petición"
+      >
+
+      <label for="category">Categoría</label>
+      <select id="category" required>
+        <option value="">Selecciona una categoría</option>
+        <option value="Sugerencia">Sugerencia</option>
+        <option value="Queja">Queja</option>
+        <option value="Opinión">Opinión</option>
+        <option value="Convivencia">Convivencia</option>
+        <option value="Infraestructura">Infraestructura</option>
+        <option value="Académico">Académico</option>
+        <option value="Otro">Otro</option>
+      </select>
+
+      <label for="message">Mensaje</label>
+      <textarea
+        id="message"
+        maxlength="4000"
+        required
+        placeholder="Escribe tu petición de forma respetuosa..."
+      ></textarea>
+
+      <div class="counter">
+        <span id="wordCount">0</span>/500 palabras
+      </div>
+
+      <button class="btn" type="submit">
+        Enviar petición
+      </button>
+
+      <div id="formMessage" class="small" style="margin-top:15px;"></div>
+
+    </form>
+
+  </div>
+</section>
+
+<section class="section" id="seguimiento">
+
+  <div class="section-head">
+    <h2>Seguimiento</h2>
+    <div class="small">
+      Introduce el código que recibiste al enviar tu petición.
+    </div>
+  </div>
+
+  <div class="form-card">
+
+    <input
+      id="trackingInput"
+      type="text"
+      placeholder="Ejemplo: PFHD-0000001"
+      maxlength="12"
+    >
+
+    <button class="btn" onclick="trackPetition()">
+      Consultar estado
+    </button>
+
+    <div id="trackingResult" class="tracking-result"></div>
+
+  </div>
+</section>
+
+<section class="section" id="anuncios">
+
+  <div class="section-head">
+    <h2>Anuncios de administración</h2>
+    <div class="small">
+      Información publicada por el equipo administrador.
+    </div>
+  </div>
+
+  <div class="form-card">
+    <div id="announcementsList" class="list">
+      <div class="empty">Cargando anuncios...</div>
+    </div>
+  </div>
+
+</section>
+
+<section class="section" id="peticiones">
+
+  <div class="section-head">
+    <h2>Peticiones públicas</h2>
+    <div class="small">
+      Las peticiones aparecen de acuerdo con el apoyo recibido.
+    </div>
+  </div>
+
+  <div id="petitionsList">
+    <div class="empty">Cargando peticiones...</div>
+  </div>
+
+</section>
+
+<footer>
+  <p>Buzón Digital Estudiantil</p>
+  <p style="margin-top:6px;font-size:13px;">
+    Espacio creado para mejorar la comunicación y convivencia institucional.
+  </p>
+</footer>
+
+<div id="rulesModal" class="modal">
+
+  <div class="modal-box">
+
+    <h2>Reglas de uso</h2>
+
+    <p>
+      Antes de utilizar el buzón, recuerda que este espacio existe
+      para ayudar a mejorar la institución.
+    </p>
+
+    <ul>
+      <li>Utiliza un lenguaje respetuoso.</li>
+      <li>No publiques insultos, amenazas o contenido ofensivo.</li>
+      <li>No compartas información personal de otras personas.</li>
+      <li>Las peticiones son públicas, pero tu identidad permanece anónima.</li>
+      <li>Cada persona puede realizar máximo 2 peticiones por día.</li>
+      <li>Los mensajes tienen un límite de 500 palabras.</li>
+    </ul>
+
+    <button class="btn" onclick="closeRules()">
+      Entiendo y deseo continuar
+    </button>
+
+  </div>
+
 </div>
+
 <script>
-const SUPABASE_URL="https://gjsnsnbozmkicmhymraw.supabase.co";
-const SUPABASE_KEY="sb_publishable_o5rWmb1u8NEVLoTp01NT4A_nsRVofMe";
-const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let token=sessionStorage.getItem("admin_session");
-const esc=t=>{const d=document.createElement("div");d.textContent=t??"";return d.innerHTML};
-function msg(id,text,ok=false){document.getElementById(id).innerHTML=`<div class="notice ${ok?'ok':'err'}">${esc(text)}</div>`}
-async function login(){
- const u=document.getElementById("username").value.trim(),p=document.getElementById("password").value;
- if(!u||!p){msg("loginMsg","Completa usuario y contraseña.");return}
- const {data,error}=await sb.rpc("admin_login",{p_username:u,p_password:p});
- if(error||!data){msg("loginMsg","Usuario o contraseña incorrectos.");return}
- token=data;sessionStorage.setItem("admin_session",token);document.getElementById("loginCard").classList.add("hidden");document.getElementById("panel").classList.remove("hidden");loadAll();
+
+const SUPABASE_URL =
+  "https://gjsnsnbozmkicmhymraw.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_o5rWmb1u8NEVLoTp01NT4A_nsRVofMe";
+
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+
+/* =========================
+   REGLAS
+========================= */
+
+function closeRules() {
+  document.getElementById("rulesModal").classList.add("hidden");
 }
-async function valid(){if(!token)return false;const {data}=await sb.rpc("admin_is_valid",{p_token:token});return data===true}
-async function logout(){if(token)await sb.rpc("admin_logout",{p_token:token});sessionStorage.removeItem("admin_session");location.reload()}
-async function loadAll(){if(!(await valid())){sessionStorage.removeItem("admin_session");location.reload();return}loadStats();loadAnnouncements();loadPetitions()}
-async function loadStats(){const {data}=await sb.from("petitions").select("status");const a=data||[];const statuses=['Recibida','En revisión','En proceso','Resuelta','No aprobada'];document.getElementById("stats").innerHTML=statuses.map(s=>`<div class="stat"><b>${a.filter(x=>x.status===s).length}</b>${s}</div>`).join("")}
-async function loadAnnouncements(){const {data,error}=await sb.from("announcements").select("*").order("created_at",{ascending:false});const el=document.getElementById("announcements");if(error){el.innerHTML='<p class="meta">No se pudieron cargar los anuncios.</p>';return}if(!data.length){el.innerHTML='<p class="meta">No hay anuncios todavía.</p>';return}el.innerHTML=data.map(a=>`<div class="announcement"><strong>${esc(a.title)}</strong><p>${esc(a.content).replace(/\n/g,"<br>")}</p><span class="meta">${new Date(a.created_at).toLocaleString()}</span><div class="actions"><button class="danger" onclick="deleteAnnouncement(${a.id})">Eliminar</button></div></div>`).join("")}
-async function createAnnouncement(){const title=document.getElementById("annTitle").value.trim(),content=document.getElementById("annContent").value.trim();if(!title||!content){msg("annMsg","Completa título y contenido.");return}const {data,error}=await sb.rpc("admin_create_announcement",{p_token:token,p_title:title,p_content:content,p_published:true});if(error||!data){msg("annMsg","No se pudo publicar el anuncio.");return}document.getElementById("annTitle").value="";document.getElementById("annContent").value="";msg("annMsg","Anuncio publicado correctamente.",true);loadAnnouncements()}
-async function deleteAnnouncement(id){if(!confirm("¿Eliminar este anuncio?"))return;const {data,error}=await sb.rpc("admin_delete_announcement",{p_token:token,p_id:id});if(error||!data){alert("No se pudo eliminar el anuncio.");return}loadAnnouncements()}
-async function loadPetitions(){const {data,error}=await sb.from("petitions").select("*").order("created_at",{ascending:false});const el=document.getElementById("petitions");if(error){el.textContent="No se pudieron cargar las peticiones.";return}if(!data.length){el.innerHTML='<p class="meta">No hay peticiones.</p>';return}const {data:comments}=await sb.from("comments").select("petition_id,message,created_at").order("created_at",{ascending:true});const cm={};(comments||[]).forEach(c=>(cm[c.petition_id]??=[]).push(c));el.innerHTML=data.map(p=>`<article class="petition"><span class="code">${esc(p.tracking_code)}</span><h3>${esc(p.title)}</h3><p class="meta">${esc(p.category)} · ${new Date(p.created_at).toLocaleString()}</p><p>${esc(p.message).replace(/\n/g,"<br>")}</p><label>Estado</label><select id="status-${p.id}">${['Recibida','En revisión','En proceso','Resuelta','No aprobada'].map(s=>`<option ${s===p.status?'selected':''}>${s}</option>`).join('')}</select><div class="actions"><button class="secondary" onclick="updateStatus(${p.id})">Guardar estado</button></div><label>Respuesta de administración</label><textarea id="comment-${p.id}" maxlength="3000" placeholder="Escribe una respuesta oficial..."></textarea><div class="actions"><button class="primary" onclick="addComment(${p.id})">Publicar respuesta</button></div>${(cm[p.id]||[]).map(c=>`<div class="announcement"><strong>Administración</strong><p>${esc(c.message).replace(/\n/g,"<br>")}</p><span class="meta">${new Date(c.created_at).toLocaleString()}</span></div>`).join('')}</article>`).join("")}
-async function updateStatus(id){const status=document.getElementById(`status-${id}`).value;const {data,error}=await sb.rpc("admin_update_petition",{p_token:token,p_petition_id:id,p_status:status});if(error||!data){alert("No se pudo actualizar el estado.");return}loadStats();loadPetitions()}
-async function addComment(id){const box=document.getElementById(`comment-${id}`),message=box.value.trim();if(!message)return;const {data,error}=await sb.rpc("admin_add_comment",{p_token:token,p_petition_id:id,p_message:message});if(error||!data){alert("No se pudo publicar la respuesta.");return}box.value="";loadPetitions()}
-if(token){document.getElementById("loginCard").classList.add("hidden");document.getElementById("panel").classList.remove("hidden");loadAll()}
-</script>
-</body>
-</html>
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const accepted = localStorage.getItem("rulesAccepted");
+
+  if (accepted === "true") {
+    closeRules();
+  }
+
+});
+
+
+document
+  .getElementById("rulesModal")
+  .querySelector("button")
+  .addEventListener("click", () => {
+
+    localStorage.setItem("rulesAccepted", "true");
+
+  });
+
+
+/* =========================
+   CONTADOR DE PALABRAS
+========================= */
+
+const messageInput =
+  document.getElementById("message");
+
+const wordCount =
+  document.getElementById("wordCount");
+
+messageInput.addEventListener("input", () => {
+
+  const text = messageInput.value.trim();
+
+  const words = text
+    ? text.split(/\s+/).length
+    : 0;
+
+  wordCount.textContent = words;
+
+  if (words > 500) {
+    wordCount.style.color = "red";
+  } else {
+    wordCount.style.color = "";
+  }
+
+});
+
+
+/* =========================
+   FILTRO
+========================= */
+
+const badWords = [
+  "idiota",
+  "estupido",
+  "estúpido",
+  "imbecil",
+  "imbécil",
+  "pendejo",
+  "pendeja",
+  "mierda",
+  "puto",
+  "puta",
+  "cabron",
+  "cabrón",
+  "maldito"
+];
+
+function containsBadWords(text) {
+
+  const lower = text.toLowerCase();
+
+  return badWords.some(word =>
+    lower.includes(word)
+  );
+
+}
+
+
+/* =========================
+   EMOJIS
+========================= */
+
+function hasEmoji(text) {
+
+  return /[\u{1F300}-\u{1FAFF}]/u.test(text);
+
+}
+
+
+/* =========================
+   LIMITE DIARIO
+========================= */
+
+function getDailyKey() {
+
+  const date =
+    new Date().toISOString().slice(0, 10);
+
+  return "petitions_" + date;
+
+}
+
+function getDailyCount() {
+
+  return Number(
+    localStorage.getItem(getDailyKey()) || 0
+  );
+
+}
+
+function increaseDailyCount() {
+
+  const key = getDailyKey();
+
+  localStorage.setItem(
+    key,
+    getDailyCount() + 1
+  );
+
+}
+
+
+/* =========================
+   ENVIAR PETICIÓN
+========================= */
+
+document
+  .getElementById("petitionForm")
+  .addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    const formMessage =
+      document.getElementById("formMessage");
+
+    const title =
+      document.getElementById("title").value.trim();
+
+    const category =
+      document.getElementById("category").value;
+
+    const message =
+      document.getElementById("message").value.trim();
+
+
+    const words = message
+      ? message.split(/\s+/).length
+      : 0;
+
+
+    if (getDailyCount() >= 2) {
+
+      formMessage.textContent =
+        "Ya alcanzaste el máximo de 2 peticiones por día.";
+
+      return;
+
+    }
+
+
+    if (words > 500) {
+
+      formMessage.textContent =
+        "El mensaje supera el límite de 500 palabras.";
+
+      return;
+
+    }
+
+
+    if (containsBadWords(message) || containsBadWords(title)) {
+
+      formMessage.textContent =
+        "El mensaje contiene lenguaje que no cumple las reglas de convivencia.";
+
+      return;
+
+    }
+
+
+    if (hasEmoji(title) || hasEmoji(message)) {
+
+      formMessage.textContent =
+        "No se permiten emojis en las peticiones.";
+
+      return;
+
+    }
+
+
+    formMessage.textContent =
+      "Enviando...";
+
+
+    const clientToken =
+      localStorage.getItem("clientToken") ||
+      crypto.randomUUID();
+
+
+    localStorage.setItem(
+      "clientToken",
+      clientToken
+    );
+
+
+    const { data, error } =
+      await db
+        .from("petitions")
+        .insert({
+
+          title: title,
+          category: category,
+          message: message,
+          client_token: clientToken
+
+        })
+        .select("tracking_code")
+        .single();
+
+
+    if (error) {
+
+      console.error(error);
+
+      formMessage.textContent =
+        "No se pudo enviar la petición. Intenta nuevamente.";
+
+      return;
+
+    }
+
+
+    increaseDailyCount();
+
+
+    formMessage.innerHTML =
+      "Petición enviada correctamente. Tu código de seguimiento es: " +
+      '<span class="code">' +
+      data.tracking_code +
+      "</span>";
+
+
+    document
+      .getElementById("petitionForm")
+      .reset();
+
+    wordCount.textContent = "0";
+
+
+    loadPetitions();
+
+  });
+
+
+/* =========================
+   CARGAR ANUNCIOS
+========================= */
+
+async function loadAnnouncements() {
+
+  const container =
+    document.getElementById("announcementsList");
+
+
+  const { data, error } =
+    await db
+      .from("announcements")
+      .select("title, content, created_at")
+      .eq("published", true)
+      .order("created_at", {
+        ascending: false
+      });
+
+
+  if (error) {
+
+    console.error(error);
+
+    container.innerHTML =
+      '<div class="empty">No se pudieron cargar los anuncios.</div>';
+
+    return;
+
+  }
+
+
+  if (!data || data.length === 0) {
+
+    container.innerHTML =
+      '<div class="empty">No hay anuncios publicados.</div>';
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    data.map(item => {
+
+      const date =
+        new Date(item.created_at)
+          .toLocaleString("es-EC");
+
+
+      return `
+        <div class="petition-card">
+          <div class="petition-title">
+            ${escapeHtml(item.title)}
+          </div>
+
+          <div class="petition-message">
+            ${escapeHtml(item.content)}
+          </div>
+
+          <div class="meta">
+            Publicado: ${date}
+          </div>
+        </div>
+      `;
+
+    }).join("");
+
+}
+
+
+/* =========================
+   CARGAR PETICIONES
+========================= */
+
+async function loadPetitions() {
+
+  const container =
+    document.getElementById("petitionsList");
+
+
+  const { data, error } =
+    await db
+      .from("petitions")
+      .select("*")
+      .order("created_at", {
+        ascending: false
+      });
+
+
+  if (error) {
+
+    console.error(error);
+
+    container.innerHTML =
+      '<div class="empty">No se pudieron cargar las peticiones.</div>';
+
+    return;
+
+  }
+
+
+  if (!data || data.length === 0) {
+
+    container.innerHTML =
+      '<div class="empty">Todavía no hay peticiones publicadas.</div>';
+
+    return;
+
+  }
+
+
+  const petitionsWithRatings =
+    await Promise.all(
+
+      data.map(async petition => {
+
+        const { data: ratings } =
+          await db
+            .from("ratings")
+            .select("rating")
+            .eq("petition_id", petition.id);
+
+
+        const average =
+          ratings && ratings.length
+            ? ratings.reduce(
+                (sum, item) =>
+                  sum + item.rating,
+                0
+              ) / ratings.length
+            : 0;
+
+
+        return {
+          ...petition,
+          averageRating: average,
+          ratingCount:
+            ratings ? ratings.length : 0
+        };
+
+      })
+
+    );
+
+
+  petitionsWithRatings.sort(
+    (a, b) =>
+      b.averageRating - a.averageRating
+  );
+
+
+  container.innerHTML =
+    petitionsWithRatings
+      .map(renderPetition)
+      .join("");
+
+}
+
+
+/* =========================
+   MOSTRAR PETICIÓN
+========================= */
+
+async function renderPetition(petition) {
+
+  const comments =
+    await getComments(petition.id);
+
+  return `
+    <div class="petition-card">
+
+      <div class="petition-title">
+        ${escapeHtml(petition.title)}
+      </div>
+
+      <div class="meta">
+        Categoría: ${escapeHtml(petition.category)}
+      </div>
+
+      <div class="petition-message">
+        ${escapeHtml(petition.message)}
+      </div>
+
+      <div class="meta">
+        Código:
+        <span class="code">
+          ${escapeHtml(petition.tracking_code)}
+        </span>
+      </div>
+
+      <div class="status">
+        Estado: ${escapeHtml(petition.status)}
+      </div>
+
+      <div class="stars">
+
+        <span>
+          Valoración:
+        </span>
+
+        ${[1,2,3,4,5].map(star => `
+
+          <span
+            class="star ${star <= Math.round(petition.averageRating) ? "active" : ""}"
+            onclick="ratePetition(${petition.id}, ${star})"
+          >
+            ★
+          </span>
+
+        `).join("")}
+
+        <span class="small">
+          (${petition.ratingCount} votos)
+        </span>
+
+      </div>
+
+      <div class="comments">
+
+        <strong>
+          Respuesta de administración
+        </strong>
+
+        ${
+          comments.length
+            ? comments.map(comment => `
+                <div class="comment">
+                  ${escapeHtml(comment.message)}
+                  <div class="meta">
+                    ${new Date(comment.created_at).toLocaleString("es-EC")}
+                  </div>
+                </div>
+              `).join("")
+            : '<div class="small" style="margin-top:8px;">Todavía no hay una respuesta.</div>'
+        }
+
+      </div>
+
+    </div>
+  `;
+
+}
+
+
+/* =========================
+   COMENTARIOS
+========================= */
+
+async function getComments(petitionId) {
+
+  const { data, error } =
+    await db
+      .from("comments")
+      .select("message, created_at")
+      .eq("petition_id", petitionId)
+      .order("created_at", {
+        ascending: true
+      });
+
+
+  if (error) {
+
+    console.error(error);
+
+    return [];
+
+  }
+
+
+  return data || [];
+
+}
+
+
+/* =========================
+   VALORACIONES
+========================= */
+
+async function ratePetition(
+  petitionId,
+  rating
+) {
+
+  const key =
+    "rated_" + petitionId;
+
+
+  if (localStorage.getItem(key)) {
+
+    alert(
+      "Ya valoraste esta petición desde este dispositivo."
+    );
+
+    return;
+
+  }
+
+
+  const { error } =
+    await db
+      .from("ratings")
+      .insert({
+
+        petition_id: petitionId,
+        rating: rating
+
+      });
+
+
+  if (error) {
+
+    console.error(error);
+
+    alert(
+      "No se pudo registrar la valoración."
+    );
+
+    return;
+
+  }
+
+
+  localStorage.setItem(key, "true");
+
+  loadPetitions();
+
+}
+
+
+/* =========================
+   SEGUIMIENTO
+========================= */
+
+async function trackPetition() {
+
+  const input =
+    document
+      .getElementById("trackingInput")
+      .value
+      .trim()
+      .toUpperCase();
+
+
+  const result =
+    document.getElementById(
+      "trackingResult"
+    );
+
+
+  if (!input) {
+
+    result.innerHTML =
+      '<div class="small">Introduce un código de seguimiento.</div>';
+
+    return;
+
+  }
+
+
+  const { data, error } =
+    await db
+      .from("petitions")
+      .select(
+        "tracking_code,title,category,status,created_at"
+      )
+      .eq("tracking_code", input)
+      .maybeSingle();
+
+
+  if (error) {
+
+    console.error(error);
+
+    result.innerHTML =
+      '<div class="small">Ocurrió un error al consultar.</div>';
+
+    return;
+
+  }
+
+
+  if (!data) {
+
+    result.innerHTML =
+      '<div class="small">No se encontró una petición con ese código.</div>';
+
+    return;
+
+  }
+
+
+  result.i
