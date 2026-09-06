@@ -4,59 +4,183 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Administración | Buzón Digital</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-:root{--celeste:#8ed8f8;--celeste-claro:#eaf9ff;--azul:#12385b;--verde:#174f43;--gris:#64748b;--borde:#d7e5ed;--fondo:#f5fbfe;--rojo:#9f1d1d}
-*{box-sizing:border-box;font-family:Arial,sans-serif}body{margin:0;background:var(--fondo);color:var(--azul)}header{background:var(--azul);color:#fff;padding:24px;text-align:center}header h1{margin:0 0 6px}.container{width:min(1100px,94%);margin:24px auto}.card{background:#fff;border:1px solid var(--borde);border-radius:18px;padding:22px;margin-bottom:20px;box-shadow:0 5px 20px rgba(18,56,91,.08)}label{display:block;font-weight:bold;margin:12px 0 7px}input,textarea,select{width:100%;padding:12px;border:1px solid var(--borde);border-radius:10px;font-size:15px}textarea{min-height:110px;resize:vertical}button{border:0;border-radius:10px;padding:11px 16px;font-weight:bold;cursor:pointer}.primary{background:var(--verde);color:#fff}.secondary{background:var(--celeste);color:var(--azul)}.danger{background:#ffe7e7;color:var(--rojo)}.top{display:flex;justify-content:space-between;gap:12px;align-items:center}.hidden{display:none}.login{max-width:480px;margin:45px auto}.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.stat{background:var(--celeste-claro);padding:15px;border-radius:12px;text-align:center}.stat b{display:block;font-size:24px}.petition{border:1px solid var(--borde);border-radius:14px;padding:17px;margin:14px 0}.code{display:inline-block;background:var(--azul);color:#fff;padding:5px 8px;border-radius:7px;font-size:12px;font-weight:bold}.meta{color:var(--gris);font-size:13px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.notice{padding:11px;border-radius:9px;margin-top:10px}.ok{background:#e7f5ef;color:var(--verde)}.err{background:#fff0f0;color:var(--rojo)}.announcement{border-left:4px solid var(--verde);background:#eef8f5;padding:13px;border-radius:8px;margin:10px 0}@media(max-width:750px){.stats{grid-template-columns:repeat(2,1fr)}.top{align-items:flex-start;flex-direction:column}}
-</style>
-</head>
-<body>
-<header><h1>Panel de Administración</h1><p>Buzón Digital Estudiantil</p></header>
-<div class="container">
-<section id="loginCard" class="card login">
-<h2>Acceso de administración</h2>
-<p class="meta">Este apartado es exclusivo para el equipo administrador.</p>
-<label for="username">Usuario</label><input id="username" autocomplete="username">
-<label for="password">Contraseña</label><input id="password" type="password" autocomplete="current-password">
-<button class="primary" style="width:100%;margin-top:16px" onclick="login()">Ingresar</button>
-<div id="loginMsg"></div>
-</section>
 
-<main id="panel" class="hidden">
-<div class="card top"><div><h2 style="margin:0">Administración</h2><p class="meta">Gestiona peticiones, respuestas y anuncios.</p></div><button class="danger" onclick="logout()">Cerrar sesión</button></div>
-<div class="card"><h2>Resumen</h2><div class="stats" id="stats"></div></div>
-<div class="card"><h2>Publicar anuncio</h2><label for="annTitle">Título</label><input id="annTitle" maxlength="150" placeholder="Ejemplo: Reunión estudiantil">
-<label for="annContent">Contenido</label><textarea id="annContent" maxlength="3000" placeholder="Escribe el anuncio..."></textarea>
-<button class="primary" style="margin-top:12px" onclick="createAnnouncement()">Publicar anuncio</button><div id="annMsg"></div></div>
-<div class="card"><h2>Anuncios publicados</h2><div id="announcements"></div></div>
-<div class="card"><h2>Peticiones</h2><div id="petitions">Cargando...</div></div>
-</main>
-</div>
-<script>
-const SUPABASE_URL="https://gjsnsnbozmkicmhymraw.supabase.co";
-const SUPABASE_KEY="sb_publishable_o5rWmb1u8NEVLoTp01NT4A_nsRVofMe";
-const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let token=sessionStorage.getItem("admin_session");
-const esc=t=>{const d=document.createElement("div");d.textContent=t??"";return d.innerHTML};
-function msg(id,text,ok=false){document.getElementById(id).innerHTML=`<div class="notice ${ok?'ok':'err'}">${esc(text)}</div>`}
-async function login(){
- const u=document.getElementById("username").value.trim(),p=document.getElementById("password").value;
- if(!u||!p){msg("loginMsg","Completa usuario y contraseña.");return}
- const {data,error}=await sb.rpc("admin_login",{p_username:u,p_password:p});
- if(error||!data){msg("loginMsg","Usuario o contraseña incorrectos.");return}
- token=data;sessionStorage.setItem("admin_session",token);document.getElementById("loginCard").classList.add("hidden");document.getElementById("panel").classList.remove("hidden");loadAll();
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
 }
-async function valid(){if(!token)return false;const {data}=await sb.rpc("admin_is_valid",{p_token:token});return data===true}
-async function logout(){if(token)await sb.rpc("admin_logout",{p_token:token});sessionStorage.removeItem("admin_session");location.reload()}
-async function loadAll(){if(!(await valid())){sessionStorage.removeItem("admin_session");location.reload();return}loadStats();loadAnnouncements();loadPetitions()}
-async function loadStats(){const {data}=await sb.from("petitions").select("status");const a=data||[];const statuses=['Recibida','En revisión','En proceso','Resuelta','No aprobada'];document.getElementById("stats").innerHTML=statuses.map(s=>`<div class="stat"><b>${a.filter(x=>x.status===s).length}</b>${s}</div>`).join("")}
-async function loadAnnouncements(){const {data,error}=await sb.from("announcements").select("*").order("created_at",{ascending:false});const el=document.getElementById("announcements");if(error){el.innerHTML='<p class="meta">No se pudieron cargar los anuncios.</p>';return}if(!data.length){el.innerHTML='<p class="meta">No hay anuncios todavía.</p>';return}el.innerHTML=data.map(a=>`<div class="announcement"><strong>${esc(a.title)}</strong><p>${esc(a.content).replace(/\n/g,"<br>")}</p><span class="meta">${new Date(a.created_at).toLocaleString()}</span><div class="actions"><button class="danger" onclick="deleteAnnouncement(${a.id})">Eliminar</button></div></div>`).join("")}
-async function createAnnouncement(){const title=document.getElementById("annTitle").value.trim(),content=document.getElementById("annContent").value.trim();if(!title||!content){msg("annMsg","Completa título y contenido.");return}const {data,error}=await sb.rpc("admin_create_announcement",{p_token:token,p_title:title,p_content:content,p_published:true});if(error||!data){msg("annMsg","No se pudo publicar el anuncio.");return}document.getElementById("annTitle").value="";document.getElementById("annContent").value="";msg("annMsg","Anuncio publicado correctamente.",true);loadAnnouncements()}
-async function deleteAnnouncement(id){if(!confirm("¿Eliminar este anuncio?"))return;const {data,error}=await sb.rpc("admin_delete_announcement",{p_token:token,p_id:id});if(error||!data){alert("No se pudo eliminar el anuncio.");return}loadAnnouncements()}
-async function loadPetitions(){const {data,error}=await sb.from("petitions").select("*").order("created_at",{ascending:false});const el=document.getElementById("petitions");if(error){el.textContent="No se pudieron cargar las peticiones.";return}if(!data.length){el.innerHTML='<p class="meta">No hay peticiones.</p>';return}const {data:comments}=await sb.from("comments").select("petition_id,message,created_at").order("created_at",{ascending:true});const cm={};(comments||[]).forEach(c=>(cm[c.petition_id]??=[]).push(c));el.innerHTML=data.map(p=>`<article class="petition"><span class="code">${esc(p.tracking_code)}</span><h3>${esc(p.title)}</h3><p class="meta">${esc(p.category)} · ${new Date(p.created_at).toLocaleString()}</p><p>${esc(p.message).replace(/\n/g,"<br>")}</p><label>Estado</label><select id="status-${p.id}">${['Recibida','En revisión','En proceso','Resuelta','No aprobada'].map(s=>`<option ${s===p.status?'selected':''}>${s}</option>`).join('')}</select><div class="actions"><button class="secondary" onclick="updateStatus(${p.id})">Guardar estado</button></div><label>Respuesta de administración</label><textarea id="comment-${p.id}" maxlength="3000" placeholder="Escribe una respuesta oficial..."></textarea><div class="actions"><button class="primary" onclick="addComment(${p.id})">Publicar respuesta</button></div>${(cm[p.id]||[]).map(c=>`<div class="announcement"><strong>Administración</strong><p>${esc(c.message).replace(/\n/g,"<br>")}</p><span class="meta">${new Date(c.created_at).toLocaleString()}</span></div>`).join('')}</article>`).join("")}
-async function updateStatus(id){const status=document.getElementById(`status-${id}`).value;const {data,error}=await sb.rpc("admin_update_petition",{p_token:token,p_petition_id:id,p_status:status});if(error||!data){alert("No se pudo actualizar el estado.");return}loadStats();loadPetitions()}
-async function addComment(id){const box=document.getElementById(`comment-${id}`),message=box.value.trim();if(!message)return;const {data,error}=await sb.rpc("admin_add_comment",{p_token:token,p_petition_id:id,p_message:message});if(error||!data){alert("No se pudo publicar la respuesta.");return}box.value="";loadPetitions()}
-if(token){document.getElementById("loginCard").classList.add("hidden");document.getElementById("panel").classList.remove("hidden");loadAll()}
-</script>
-</body>
-</html>
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f4fbff;
+  color:#102a43;
+}
+
+header{
+  background:#0b2d4d;
+  color:white;
+  padding:18px 7%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.logo{
+  font-weight:bold;
+  font-size:20px;
+}
+
+.container{
+  width:min(1100px,92%);
+  margin:35px auto;
+}
+
+.card{
+  background:white;
+  padding:25px;
+  border-radius:18px;
+  margin-bottom:25px;
+  box-shadow:0 7px 25px rgba(11,45,77,.08);
+}
+
+h1,h2{
+  color:#0b2d4d;
+  margin-bottom:15px;
+}
+
+label{
+  display:block;
+  font-weight:bold;
+  margin:14px 0 7px;
+}
+
+input,textarea,select{
+  width:100%;
+  padding:12px;
+  border:1px solid #cbdde7;
+  border-radius:10px;
+  font-size:15px;
+  font-family:inherit;
+}
+
+textarea{
+  min-height:130px;
+  resize:vertical;
+}
+
+button{
+  border:0;
+  padding:11px 16px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:bold;
+  margin-top:12px;
+}
+
+.primary{
+  background:#0b2d4d;
+  color:white;
+}
+
+.green{
+  background:#0d684d;
+  color:white;
+}
+
+.red{
+  background:#b3261e;
+  color:white;
+}
+
+.gray{
+  background:#e6eef3;
+  color:#102a43;
+}
+
+.hidden{
+  display:none!important;
+}
+
+.error{
+  background:#fff0f0;
+  border-left:5px solid #c62828;
+  padding:13px;
+  border-radius:8px;
+  margin-top:15px;
+}
+
+.success{
+  background:#e9f8ef;
+  border-left:5px solid #0d684d;
+  padding:13px;
+  border-radius:8px;
+  margin-top:15px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:12px;
+  margin-top:20px;
+}
+
+.stat{
+  background:#f1f9fc;
+  padding:18px;
+  border-radius:12px;
+  text-align:center;
+}
+
+.stat strong{
+  display:block;
+  font-size:25px;
+  color:#0b2d4d;
+}
+
+.petition{
+  border:1px solid #dbe8ee;
+  border-radius:14px;
+  padding:20px;
+  margin-top:15px;
+}
+
+.petition h3{
+  margin-bottom:5px;
+}
+
+.meta{
+  color:#607d8b;
+  font-size:13px;
+  margin-bottom:12px;
+}
+
+.message{
+  white-space:pre-wrap;
+  margin:12px 0;
+}
+
+.comment{
+  background:#f4fbff;
+  padding:12px;
+  border-radius:10px;
+  margin-top:8px;
+}
+
+.announcement{
+  background:#f4fbff;
+  border-left:5px solid #0d684d;
+  padding:15px;
+  margin-top:12px;
+  border-radius:8px;
+}
+
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:15px;
+}
