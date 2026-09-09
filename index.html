@@ -32,12 +32,26 @@ label{display:block;font-size:14px;font-weight:700;margin-bottom:7px}input,texta
 .rating{display:flex;align-items:center;gap:7px;margin-top:15px}.stars{display:flex;gap:2px}.star{border:0;background:transparent;font-size:24px;color:#b9c7d0;padding:0}.star.active,.star:hover{color:#f3b51b}.score{font-size:13px;font-weight:700;color:var(--blue)}
 .empty{text-align:center;padding:35px;color:var(--muted);border:1px dashed var(--line);border-radius:18px;background:#fff}
 .comments{margin-top:18px;border-top:1px solid var(--line);padding-top:15px}.comments h4{margin:0 0 10px;color:var(--navy)}.comment{background:#f4fafc;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:9px}.comment b{color:var(--green)}.comment span{font-size:11px;color:var(--muted);margin-left:7px}.comment p{margin:6px 0 0;font-size:14px}.tracker{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}.tracker input{flex:1;min-width:220px}.track-btn{background:var(--navy);color:white;border:0;border-radius:12px;padding:12px 18px;font-weight:700}footer{background:var(--navy);color:#b8d0dd;text-align:center;padding:25px;font-size:13px}
-.modal{position:fixed;inset:0;background:#061827bb;display:flex;align-items:center;justify-content:center;padding:20px;z-index:20}.modal.hidden{display:none}.modal-box{max-width:620px;background:white;border-radius:22px;padding:28px;box-shadow:0 25px 70px #0005}.modal-box h2{margin-top:0;color:var(--navy)}.modal-box li{margin:11px 0;line-height:1.5;color:#40566b}.accept{width:100%;margin-top:10px;background:var(--green);color:white;border:0;border-radius:12px;padding:13px;font-weight:800}
+.student-login-modal{position:fixed;inset:0;background:#061827ee;display:flex;align-items:center;justify-content:center;padding:20px;z-index:40}.student-login-modal.hidden{display:none}.student-login-box{width:min(460px,100%);background:#fff;border-radius:22px;padding:28px;box-shadow:0 25px 70px #0006}.student-login-box h2{margin-top:0;color:var(--navy)}.student-login-box .login-note{font-size:13px;color:var(--muted);line-height:1.5}.student-login-box input{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;margin-top:6px;font-size:15px}.student-login-btn{width:100%;margin-top:16px;background:var(--green);color:#fff;border:0;border-radius:12px;padding:13px;font-weight:800}.student-logout{background:transparent!important;color:#d9edf7!important;border:1px solid #ffffff33!important}.modal{position:fixed;inset:0;background:#061827bb;display:flex;align-items:center;justify-content:center;padding:20px;z-index:20}.modal.hidden{display:none}.modal-box{max-width:620px;background:white;border-radius:22px;padding:28px;box-shadow:0 25px 70px #0005}.modal-box h2{margin-top:0;color:var(--navy)}.modal-box li{margin:11px 0;line-height:1.5;color:#40566b}.accept{width:100%;margin-top:10px;background:var(--green);color:white;border:0;border-radius:12px;padding:13px;font-weight:800}
 .notice{background:#edf9f4;border:1px solid #bfe4d3;color:#155c47;border-radius:13px;padding:12px 14px;font-size:13px;line-height:1.5;margin-bottom:15px}
 @media(max-width:750px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.hero-card{padding:27px}.navlinks button{padding:8px}.navlinks{display:none}.form-actions{align-items:stretch;flex-direction:column}.send{width:100%}}
 </style>
 </head>
 <body>
+<div id="studentLoginModal" class="student-login-modal">
+  <div class="student-login-box">
+    <div class="eyebrow">Acceso estudiantil</div>
+    <h2>Inicia sesión para entrar al buzón</h2>
+    <p class="login-note">Este acceso es exclusivo para estudiantes del colegio. Tu usuario de acceso no se publica junto con tus peticiones y tu identidad no se muestra en las publicaciones.</p>
+    <label for="studentUsername">Usuario</label>
+    <input id="studentUsername" autocomplete="username" placeholder="Usuario estudiantil">
+    <label for="studentPassword">Contraseña</label>
+    <input id="studentPassword" type="password" autocomplete="current-password" placeholder="Contraseña">
+    <button class="student-login-btn" id="studentLoginBtn" onclick="studentLogin()">Iniciar sesión</button>
+    <div id="studentLoginMsg" class="error" style="margin-top:10px"></div>
+  </div>
+</div>
+
 <div id="rulesModal" class="modal">
   <div class="modal-box">
     <h2>Reglas de buen uso</h2>
@@ -58,7 +72,7 @@ label{display:block;font-size:14px;font-weight:700;margin-bottom:7px}input,texta
   <div class="navlinks">
     <button onclick="scrollToId('buzon')">Enviar</button>
     <button onclick="scrollToId('publicaciones')">Publicaciones</button>
-    <button onclick="openRules()">Reglas</button>
+    <button onclick="openRules()">Reglas</button><button class="student-logout" onclick="studentLogout()">Cerrar sesión</button>
   </div>
 </div></header>
 
@@ -126,6 +140,35 @@ label{display:block;font-size:14px;font-weight:700;margin-bottom:7px}input,texta
 const SUPABASE_URL="https://gjsnsnbozmkicmhymraw.supabase.co";
 const SUPABASE_KEY="sb_publishable_o5rWmb1u8NEVLoTp01NT4A_nsRVofMe";
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let studentSession=sessionStorage.getItem("student_session");
+function setPublicLocked(locked){document.getElementById("studentLoginModal").classList.toggle("hidden",!locked)}
+function studentMessage(text){document.getElementById("studentLoginMsg").textContent=text}
+async function studentLogin(){
+ const btn=document.getElementById("studentLoginBtn"),u=document.getElementById("studentUsername").value.trim(),p=document.getElementById("studentPassword").value;
+ if(!u||!p){studentMessage("Completa usuario y contraseña.");return}
+ btn.disabled=true;btn.textContent="Verificando...";studentMessage("");
+ try{
+  const {data,error}=await db.rpc("student_login",{p_username:u,p_password:p});
+  if(error||!data)throw new Error("invalid");
+  studentSession=Array.isArray(data)?data[0]?.token:data?.token||data;
+  if(!studentSession)throw new Error("invalid");
+  sessionStorage.setItem("student_session",studentSession);
+  setPublicLocked(false);
+  document.getElementById("studentUsername").value="";document.getElementById("studentPassword").value="";
+  if(!localStorage.getItem("rulesAccepted"))openRules();
+ }catch(e){studentMessage("Usuario o contraseña incorrectos.")}finally{btn.disabled=false;btn.textContent="Iniciar sesión"}
+}
+async function ensureStudentSession(){
+ if(!studentSession){setPublicLocked(true);return false}
+ const {data,error}=await db.rpc("student_is_valid",{p_token:studentSession});
+ if(error||data!==true){sessionStorage.removeItem("student_session");studentSession=null;setPublicLocked(true);return false}
+ setPublicLocked(false);return true
+}
+async function studentLogout(){
+ if(studentSession)await db.rpc("student_logout",{p_token:studentSession});
+ sessionStorage.removeItem("student_session");studentSession=null;setPublicLocked(true);
+}
+
 const badWords=["puta","puto","mierda","verga","cabron","cabrón","pendejo","pendeja","idiota","imbecil","imbécil","estupido","estúpido","estupida","estúpida","maricon","maricón","marica","cojudo","cojuda","culero","culera","joder","chingar","chinga","zorra","perra","gilipollas"];
 const emojiRegex=/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/u;
 let petitions=[],votes=JSON.parse(localStorage.getItem("buzon_votes")||"{}");
@@ -154,6 +197,7 @@ async function loadPetitions(){
  petitions=(data||[]).map(p=>({id:p.id,title:p.title,category:p.category,message:p.message,date:p.created_at,code:p.tracking_code,status:p.status||"Recibida",ratings:(p.ratings||[]).reduce((a,r)=>a+r.score,0),count:(p.ratings||[]).length,comments:p.comments||[]})); render();
 }
 async function submitPetition(){
+ if(!(await ensureStudentSession()))return;
  const title=document.getElementById("title").value.trim(),cat=document.getElementById("category").value,msg=document.getElementById("message").value.trim(),err=document.getElementById("formError"),btn=document.querySelector(".send");err.textContent="";
  if(!title||!msg){err.textContent="Completa el título y el mensaje.";return}
  if(countWords(msg)>500){err.textContent="El mensaje supera las 500 palabras.";return}
@@ -161,7 +205,7 @@ async function submitPetition(){
  if(hasBadLanguage(title+" "+msg)){err.textContent="Revisa el lenguaje. Mantengamos un espacio respetuoso.";return}
  btn.disabled=true;btn.textContent="Enviando...";
  try{
-  const {data,error}=await db.rpc("submit_petition",{p_client_token:clientToken,p_title:title,p_category:cat,p_message:msg});
+  const {data,error}=await db.rpc("submit_petition",{p_student_token:studentSession,p_client_token:clientToken,p_title:title,p_category:cat,p_message:msg});
   if(error)throw error;
   const row=Array.isArray(data)?data[0]:data;
   if(!row||!row.tracking_code)throw new Error("No se recibió el código de seguimiento.");
@@ -178,10 +222,11 @@ async function submitPetition(){
  }finally{btn.disabled=false;btn.textContent="Enviar";}
 }
 async function rate(id,value){
+ if(!(await ensureStudentSession()))return;
  if(votes[String(id)]){alert("Ya calificaste esta petición desde este dispositivo.");return}
  const buttons=[...document.querySelectorAll(`button[onclick^="rate(${id},"]`)];buttons.forEach(b=>b.disabled=true);
  try{
-  const {data,error}=await db.rpc("submit_rating",{p_client_token:clientToken,p_petition_id:id,p_score:value});
+  const {data,error}=await db.rpc("submit_rating",{p_student_token:studentSession,p_client_token:clientToken,p_petition_id:id,p_score:value});
   if(error)throw error;
   if(data!==true){alert("Ya calificaste esta petición desde este dispositivo.");return}
   votes[String(id)]=value;localStorage.setItem("buzon_votes",JSON.stringify(votes));await loadPetitions();
@@ -195,8 +240,7 @@ function render(){
  if(!arr.length){list.innerHTML='<div class="empty">Todavía no hay publicaciones en esta categoría.</div>';return}
  list.innerHTML=arr.map(p=>{const avg=p.count?p.ratings/p.count:0;const stars=[1,2,3,4,5].map(i=>`<button class="star ${i<=Math.round(avg)?"active":""}" onclick="rate(${p.id},${i})">★</button>`).join("");const comments=(p.comments||[]).map(c=>`<div class="comment"><b>Administrador</b><span>${new Date(c.created_at).toLocaleDateString("es-EC")}</span><p>${escapeHtml(c.message)}</p></div>`).join("");return `<article class="petition"><div class="petition-top"><span class="tag">${escapeHtml(p.category)}</span><span class="meta">Anónimo · ${new Date(p.date).toLocaleDateString("es-EC")}</span></div><div class="meta" style="margin-top:8px"><b>${escapeHtml(p.code||"Sin código")}</b> · Estado: <b>${escapeHtml(p.status)}</b></div><h3>${escapeHtml(p.title)}</h3><p>${escapeHtml(p.message)}</p><div class="rating"><div class="stars">${stars}</div><span class="score">${avg.toFixed(1)} · ${p.count} valoración${p.count===1?"":"es"}</span></div>${comments?`<div class="comments"><h4>Respuesta de Administración</h4>${comments}</div>`:""}</article>`}).join("");
 }
-loadAnnouncements();
-loadPetitions();
+ensureStudentSession().then(()=>{loadAnnouncements();loadPetitions()});
 </script>
 </body>
 </html>
