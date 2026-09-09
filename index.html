@@ -148,6 +148,22 @@ const SUPABASE_URL="https://gjsnsnbozmkicmhymraw.supabase.co";
 const SUPABASE_KEY="sb_publishable_o5rWmb1u8NEVLoTp01NT4A_nsRVofMe";
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let studentSession=sessionStorage.getItem("student_session");
+
+let accessRole="student";
+function selectRole(role){
+ accessRole=role;
+ const sf=document.getElementById("studentLoginForm"), af=document.getElementById("adminLoginForm");
+ const sbt=document.getElementById("studentRoleBtn"), abt=document.getElementById("adminRoleBtn");
+ const isStudent=role==="student";
+ sf.classList.toggle("hidden",!isStudent); af.classList.toggle("hidden",isStudent);
+ sbt.classList.toggle("active",isStudent); abt.classList.toggle("active",!isStudent);
+ document.getElementById("studentLoginMsg").textContent="";
+ document.getElementById("adminLoginMsg").innerHTML="";
+}
+document.getElementById("studentRoleBtn").addEventListener("click",()=>selectRole("student"));
+document.getElementById("adminRoleBtn").addEventListener("click",()=>selectRole("admin"));
+selectRole("student");
+
 function setPublicLocked(locked){document.getElementById("studentLoginModal").classList.toggle("hidden",!locked)}
 function studentMessage(text){document.getElementById("studentLoginMsg").textContent=text}
 async function studentLogin(){
@@ -248,6 +264,7 @@ function render(){
  list.innerHTML=arr.map(p=>{const avg=p.count?p.ratings/p.count:0;const stars=[1,2,3,4,5].map(i=>`<button class="star ${i<=Math.round(avg)?"active":""}" onclick="rate(${p.id},${i})">★</button>`).join("");const comments=(p.comments||[]).map(c=>`<div class="comment"><b>Administrador</b><span>${new Date(c.created_at).toLocaleDateString("es-EC")}</span><p>${escapeHtml(c.message)}</p></div>`).join("");return `<article class="petition"><div class="petition-top"><span class="tag">${escapeHtml(p.category)}</span><span class="meta">Anónimo · ${new Date(p.date).toLocaleDateString("es-EC")}</span></div><div class="meta" style="margin-top:8px"><b>${escapeHtml(p.code||"Sin código")}</b> · Estado: <b>${escapeHtml(p.status)}</b></div><h3>${escapeHtml(p.title)}</h3><p>${escapeHtml(p.message)}</p><div class="rating"><div class="stars">${stars}</div><span class="score">${avg.toFixed(1)} · ${p.count} valoración${p.count===1?"":"es"}</span></div>${comments?`<div class="comments"><h4>Respuesta de Administración</h4>${comments}</div>`:""}</article>`}).join("");
 }
 ensureStudentSession().then(()=>{loadAnnouncements();loadPetitions()});
+async function logout(){return adminLogout()}
 </script><div class="hidden" id="adminArea"><main class="hidden" id="panel">
 <div class="card top"><div><h2 style="margin:0">Administración</h2><p class="meta">Gestiona peticiones, respuestas y anuncios.</p></div><button class="danger" onclick="logout()">Cerrar sesión</button></div>
 <div class="card"><h2>Resumen</h2><div class="stats" id="stats"></div></div>
@@ -281,18 +298,30 @@ const esc=t=>{const d=document.createElement("div");d.textContent=t??"";return d
 function msg(id,text,ok=false){document.getElementById(id).innerHTML=`<div class="notice ${ok?'ok':'err'}">${esc(text)}</div>`}
 async function adminLogin(){
  const button=document.getElementById("adminLoginBtn");
- const u=document.getElementById("adminUsername").value.trim(),p=document.getElementById("adminPassword").value;
+ const u=document.getElementById("adminUsername").value.trim();
+ const p=document.getElementById("adminPassword").value;
  if(!u||!p){adminMsg("adminLoginMsg","Completa usuario y contraseña.");return}
  button.disabled=true;button.textContent="Verificando...";
- const {data,error}=await sb.rpc("admin_login",{p_username:u,p_password:p});
- if(error||!data){adminMsg("adminLoginMsg","Usuario o contraseña incorrectos.");button.disabled=false;button.textContent="Ingresar";return}
- token=Array.isArray(data)?data[0]?.token:data?.token||data;
- if(!token){adminMsg("adminLoginMsg","No se pudo iniciar la sesión. Inténtalo nuevamente.");button.disabled=false;button.textContent="Ingresar";return}
- sessionStorage.setItem("admin_session",token);
-document.getElementById("studentLoginModal").classList.add("hidden");
-document.getElementById("adminArea").classList.remove("hidden");
-document.getElementById("panel").classList.remove("hidden");
-loadAll();
+ adminMsg("adminLoginMsg","");
+ try{
+  const {data,error}=await sb.rpc("admin_login",{p_username:u,p_password:p});
+  if(error) throw error;
+  token=Array.isArray(data)?data[0]?.token:data?.token||data;
+  if(!token) throw new Error("Credenciales inválidas");
+  const {data:ok,error:validError}=await sb.rpc("admin_is_valid",{p_token:token});
+  if(validError||ok!==true) throw new Error("Sesión no válida");
+  sessionStorage.setItem("admin_session",token);
+  document.getElementById("studentLoginModal").classList.add("hidden");
+  document.getElementById("adminArea").classList.remove("hidden");
+  document.getElementById("panel").classList.remove("hidden");
+  await loadAll();
+ }catch(e){
+  console.error("Admin login:",e);
+  token=null;sessionStorage.removeItem("admin_session");
+  adminMsg("adminLoginMsg","No se pudo iniciar sesión. Verifica el usuario y la contraseña.");
+ }finally{
+  button.disabled=false;button.textContent="Entrar al panel";
+ }
 }
 async function valid(){if(!token)return false;const {data,error}=await sb.rpc("admin_is_valid",{p_token:token});return !error && data===true}
 async function adminLogout(){if(token)await sb.rpc("admin_logout",{p_token:token});sessionStorage.removeItem("admin_session");location.reload()}
@@ -311,5 +340,9 @@ if(token){
    else {sessionStorage.removeItem("admin_session");token=null;}
  });
 }
+
+<script>
+document.getElementById("studentPassword").addEventListener("keydown",e=>{if(e.key==="Enter")studentLogin()});
+document.getElementById("adminPassword").addEventListener("keydown",e=>{if(e.key==="Enter")adminLogin()});
 </script></body>
 </html>
