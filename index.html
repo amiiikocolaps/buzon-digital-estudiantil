@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Buzón Digital Estudiantil</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
+:root{--sky:#dff5ff;--blue:#102a43;--navy:#071b2d;--green:#176b52;--green2:#0f513f;--white:#fff;--muted:#60758a;--line:#d8e5ed;--danger:#b42318}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,Arial,sans-serif;background:linear-gradient(180deg,var(--sky),#f7fcff 42%,#fff);color:var(--blue)}
+button,input,textarea,select{font:inherit} button{cursor:pointer}
+header{background:var(--navy);color:white;position:sticky;top:0;z-index:5;box-shadow:0 4px 20px #071b2d22}
+.nav{max-width:1100px;margin:auto;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:20px}
+.logo{font-weight:800;font-size:20px}.logo span{color:#8ddfff}
+.navlinks{display:flex;gap:8px}.navlinks button{border:0;background:transparent;color:#d9edf7;padding:10px 13px;border-radius:10px}.navlinks button:hover{background:#ffffff15}
+main{max-width:1100px;margin:auto;padding:34px 20px 70px}
+.hero{display:grid;grid-template-columns:1.3fr .7fr;gap:24px;align-items:stretch}
+.hero-card,.form-card,.info-card,.petition{background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:22px;box-shadow:0 12px 35px #0b355215}
+.hero-card{padding:38px}.eyebrow{color:var(--green);font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:.08em}
+h1{font-size:clamp(34px,6vw,58px);line-height:1.02;margin:12px 0 16px;color:var(--navy)}
+.hero p{color:var(--muted);font-size:17px;line-height:1.65;max-width:650px}
+.cta{display:inline-flex;margin-top:12px;background:var(--green);color:white;border:0;padding:13px 18px;border-radius:12px;font-weight:700}.cta:hover{background:var(--green2)}
+.hero-info{padding:26px;background:var(--navy);color:white;border-radius:22px}.hero-info h2{margin-top:0}.rule{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid #ffffff18}.rule:last-child{border:0}
+.section{margin-top:32px}.section-head{display:flex;justify-content:space-between;align-items:end;gap:15px;margin-bottom:14px}.section h2{margin:0;font-size:28px}.small{font-size:13px;color:var(--muted)}
+.form-card{padding:24px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+label{display:block;font-size:14px;font-weight:700;margin-bottom:7px}input,textarea,select{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;background:white;color:var(--blue);outline:none}textarea{min-height:160px;resize:vertical}input:focus,textarea:focus,select:focus{border-color:#65c9ee;box-shadow:0 0 0 3px #65c9ee22}
+.counter{text-align:right;color:var(--muted);font-size:12px;margin-top:5px}.form-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:15px}.error{color:var(--danger);font-size:13px;font-weight:600}.send{background:var(--green);color:#fff;border:0;border-radius:12px;padding:12px 20px;font-weight:800}.send:hover{background:var(--green2)}
+.filters{display:flex;gap:10px;flex-wrap:wrap}.filters select{width:auto;min-width:170px}
+.list{display:grid;gap:15px}.petition{padding:22px}.petition-top{display:flex;justify-content:space-between;gap:12px}.tag{display:inline-block;background:var(--sky);color:var(--blue);padding:5px 9px;border-radius:999px;font-size:12px;font-weight:700}.petition h3{margin:12px 0 7px;font-size:19px}.petition p{line-height:1.6;color:#40566b;white-space:pre-wrap}.meta{font-size:12px;color:var(--muted)}
+.rating{display:flex;align-items:center;gap:7px;margin-top:15px}.stars{display:flex;gap:2px}.star{border:0;background:transparent;font-size:24px;color:#b9c7d0;padding:0}.star.active,.star:hover{color:#f3b51b}.score{font-size:13px;font-weight:700;color:var(--blue)}
+.empty{text-align:center;padding:35px;color:var(--muted);border:1px dashed var(--line);border-radius:18px;background:#fff}
+.comments{margin-top:18px;border-top:1px solid var(--line);padding-top:15px}.comments h4{margin:0 0 10px;color:var(--navy)}.comment{background:#f4fafc;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:9px}.comment b{color:var(--green)}.comment span{font-size:11px;color:var(--muted);margin-left:7px}.comment p{margin:6px 0 0;font-size:14px}.tracker{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}.tracker input{flex:1;min-width:220px}.track-btn{background:var(--navy);color:white;border:0;border-radius:12px;padding:12px 18px;font-weight:700}footer{background:var(--navy);color:#b8d0dd;text-align:center;padding:25px;font-size:13px}
+.student-login-modal{position:fixed;inset:0;background:#061827ee;display:flex;align-items:center;justify-content:center;padding:20px;z-index:40}.student-login-modal.hidden{display:none}.student-login-box{width:min(460px,100%);background:#fff;border-radius:22px;padding:28px;box-shadow:0 25px 70px #0006}.student-login-box h2{margin-top:0;color:var(--navy)}.student-login-box .login-note{font-size:13px;color:var(--muted);line-height:1.5}.student-login-box input{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;margin-top:6px;font-size:15px}.student-login-btn{width:100%;margin-top:16px;background:var(--green);color:#fff;border:0;border-radius:12px;padding:13px;font-weight:800}.student-logout{background:transparent!important;color:#d9edf7!important;border:1px solid #ffffff33!important}.modal{position:fixed;inset:0;background:#061827bb;display:flex;align-items:center;justify-content:center;padding:20px;z-index:20}.modal.hidden{display:none}.modal-box{max-width:620px;background:white;border-radius:22px;padding:28px;box-shadow:0 25px 70px #0005}.modal-box h2{margin-top:0;color:var(--navy)}.modal-box li{margin:11px 0;line-height:1.5;color:#40566b}.accept{width:100%;margin-top:10px;background:var(--green);color:white;border:0;border-radius:12px;padding:13px;font-weight:800}
+.notice{background:#edf9f4;border:1px solid #bfe4d3;color:#155c47;border-radius:13px;padding:12px 14px;font-size:13px;line-height:1.5;margin-bottom:15px}
+@media(max-width:750px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.hero-card{padding:27px}.navlinks button{padding:8px}.navlinks{display:none}.form-actions{align-items:stretch;flex-direction:column}.send{width:100%}}
+</style>
+<style>
+#adminArea{--admin-celeste:#8ed8f8;--admin-celeste-claro:#eaf9ff;--admin-azul:#12385b;--admin-verde:#174f43;--admin-gris:#64748b;--admin-borde:#d7e5ed;--admin-fondo:#f5fbfe;--admin-rojo:#9f1d1d;background:var(--admin-fondo);color:var(--admin-azul);padding:24px 0;min-height:100vh}
+#adminArea *{box-sizing:border-box;font-family:Arial,sans-serif}
+#adminArea .container{width:min(1100px,94%);margin:24px auto}
+#adminArea .card{background:#fff;border:1px solid var(--admin-borde);border-radius:18px;padding:22px;margin-bottom:20px;box-shadow:0 5px 20px rgba(18,56,91,.08)}
+#adminArea label{display:block;font-weight:bold;margin:12px 0 7px}
+#adminArea input,#adminArea textarea,#adminArea select{width:100%;padding:12px;border:1px solid var(--admin-borde);border-radius:10px;font-size:15px}
+#adminArea textarea{min-height:110px;resize:vertical}
+#adminArea button{border:0;border-radius:10px;padding:11px 16px;font-weight:bold;cursor:pointer}
+#adminArea .primary{background:var(--admin-verde);color:#fff}
+#adminArea .secondary{background:var(--admin-celeste);color:var(--admin-azul)}
+#adminArea .danger{background:#ffe7e7;color:var(--admin-rojo)}
+#adminArea .top{display:flex;justify-content:space-between;gap:12px;align-items:center}
+#adminArea .hidden{display:none!important}
+#adminArea .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+#adminArea .stat{background:var(--admin-celeste-claro);padding:15px;border-radius:12px;text-align:center}
+#adminArea .stat b{display:block;font-size:24px}
+#adminArea .petition{border:1px solid var(--admin-borde);border-radius:14px;padding:17px;margin:14px 0}
+#adminArea .code{display:inline-block;background:var(--admin-azul);color:#fff;padding:5px 8px;border-radius:7px;font-size:12px;font-weight:bold}
+#adminArea .meta{color:var(--admin-gris);font-size:13px}
+#adminArea .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+#adminArea .notice{padding:11px;border-radius:9px;margin-top:10px}
+#adminArea .ok{background:#e7f5ef;color:var(--admin-verde)}
+#adminArea .err{background:#fff0f0;color:var(--admin-rojo)}
+#adminArea .announcement{border-left:4px solid var(--admin-verde);background:#eef8f5;padding:13px;border-radius:8px;margin:10px 0}
+@media(max-width:750px){#adminArea .stats{grid-template-columns:repeat(2,1fr)}#adminArea .top{align-items:flex-start;flex-direction:column}}
+</style></head>
+<body>
+<div class="student-login-modal" id="studentLoginModal"><div class="student-login-box"><div class="eyebrow">Acceso al Buzón Digital</div><h2>Inicia sesión</h2><p class="login-note">Selecciona tu tipo de acceso para continuar.</p><div class="role-switch"><button class="role-btn" id="studentRoleBtn" type="button">Estudiantes</button><button class="role-btn" id="adminRoleBtn" type="button">Administración</button></div><div id="studentLoginForm"><label for="studentUsername">Usuario</label><input autocomplete="username" id="studentUsername" placeholder="Usuario estudiantil" type="text"/><label for="studentPassword">Contraseña</label><input autocomplete="current-password" id="studentPassword" placeholder="Contraseña" type="password"/><button class="student-login-btn" id="studentLoginBtn" onclick="studentLogin()">Iniciar sesión</button><div class="error" id="studentLoginMsg" style="margin-top:10px"></div></div><div class="hidden" id="adminLoginForm"><label for="adminUsername">Usuario</label><input autocomplete="username" id="adminUsername" placeholder="Usuario de administración" type="text"/><label for="adminPassword">Contraseña</label><input autocomplete="current-password" id="adminPassword" placeholder="Contraseña" type="password"/><button class="student-login-btn" id="adminLoginBtn" onclick="adminLogin()">Entrar al panel</button><div class="error" id="adminLoginMsg" style="margin-top:10px"></div></div></div></div>
+<div class="modal" id="rulesModal">
+<div class="modal-box">
+<h2>Reglas de buen uso</h2>
+<p>Este buzón existe para ayudar a mejorar la institución y la comunicación entre estudiantes y autoridades.</p>
+<ul>
+<li>Escribe con respeto. No se permiten insultos, amenazas, discriminación ni contenido ofensivo.</li>
+<li>Las publicaciones son públicas, pero tu identidad se mantiene anónima.</li>
+<li>Usa el buzón para propuestas, opiniones, quejas o situaciones que ayuden a detectar oportunidades de mejora.</li>
+<li>No publiques información privada de otras personas ni contenido que altere la convivencia.</li>
+<li>Cada dispositivo puede enviar un máximo de 2 peticiones al día.</li>
+</ul>
+<button class="accept" id="acceptRules">Entiendo y acepto las reglas</button>
+</div>
+</div>
+<header><div class="nav">
+<div class="logo">Buzón <span>Digital</span></div>
+<div class="navlinks">
+<button onclick="scrollToId('buzon')">Enviar</button>
+<button onclick="scrollToId('publicaciones')">Publicaciones</button>
+<button onclick="openRules()">Reglas</button><button class="student-logout" onclick="studentLogout()">Cerrar sesión</button>
+</div>
+</div></header>
+<main>
+<section class="hero">
+<div class="hero-card">
+<div class="eyebrow">Participación estudiantil</div>
+<h1>Tu opinión puede mejorar el colegio.</h1>
+<p>Un espacio para compartir propuestas, opiniones y quejas de forma anónima. Las publicaciones son públicas para que la comunidad pueda conocerlas y apoyar las ideas que considere importantes.</p>
+<button class="cta" onclick="scrollToId('buzon')">Dejar una petición</button>
+</div>
+<div class="hero-info">
+<h2>¿Cómo funciona?</h2>
+<div class="rule"><b>01</b><span>Escribe tu propuesta u opinión.</span></div>
+<div class="rule"><b>02</b><span>El sistema revisa el lenguaje y las reglas.</span></div>
+<div class="rule"><b>03</b><span>Se publica sin mostrar tu identidad.</span></div>
+<div class="rule"><b>04</b><span>La comunidad puede calificarla de 1 a 5 estrellas.</span></div>
+</div>
+</section>
+<section class="section" id="buzon">
+<div class="section-head"><div><h2>Enviar una petición</h2><div class="small">Máximo 500 palabras. Sin emojis ni lenguaje ofensivo.</div></div></div>
+<div class="form-card">
+<div class="notice">Tu publicación será visible para todos de manera anónima. No se solicitará nombre, correo ni cuenta.</div>
+<div class="grid">
+<div>
+<label for="title">Título</label>
+<input id="title" maxlength="90" placeholder="Ej. Mejorar los espacios de estudio"/>
+</div>
+<div>
+<label for="category">Categoría</label>
+<select id="category">
+<option>Propuesta</option><option>Opinión</option><option>Queja</option><option>Comunicación</option><option>Convivencia</option><option>Infraestructura</option><option>Académico</option>
+</select>
+</div>
+</div>
+<div style="margin-top:16px">
+<label for="message">Mensaje</label>
+<textarea id="message" placeholder="Escribe aquí tu petición con respeto..."></textarea>
+<div class="counter"><span id="wordCount">0</span>/500 palabras</div>
+</div>
+<div class="form-actions"><span class="error" id="formError"></span><button class="send" onclick="submitPetition()">Enviar</button></div>
+</div>
+</section>
+<section class="section" id="seguimiento"><div class="section-head"><div><h2>Consultar una petición</h2><div class="small">Ingresa el código PFHD para ver su estado.</div></div></div><div class="form-card"><div class="tracker"><input id="trackCode" maxlength="12" placeholder="Ej. PFHD-0000001"/><button class="track-btn" onclick="trackPetition()">Consultar</button></div><div class="small" id="trackResult" style="margin-top:12px"></div></div></section>
+<section class="section" id="anuncios">
+<div class="section-head"><div><h2>Anuncios de administración</h2><div class="small">Información publicada por el equipo administrador.</div></div></div>
+<div class="form-card"><div class="list" id="announcementsList"><div class="empty">Cargando anuncios...</div></div></div>
+</section>
+<section class="section" id="publicaciones">
+<div class="section-head">
+<div><h2>Peticiónes de la comunidad</h2><div class="small">Las más apoyadas aparecen primero.</div></div>
+<div class="filters"><select id="sort" onchange="render()"><option value="score">Más apoyadas</option><option value="new">Más recientes</option></select><select id="filter" onchange="render()"><option value="all">Todas</option><option>Propuesta</option><option>Opinión</option><option>Queja</option><option>Comunicación</option><option>Convivencia</option><option>Infraestructura</option><option>Académico</option></select></div>
+</div>
+<div class="list" id="list"></div>
+</section>
+</main>
+<footer>Buzón Digital Estudiantil · Participación, respeto y mejora institucional</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://gjsnsnbozmkicmhymraw.supabase.co";
+const SUPABASE_KEY="sb_publishable_o5rWmb1u8NEVLoTp01NT4A_nsRVofMe";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let studentSession=sessionStorage.getItem("student_session");
+
+let accessRole="student";
+function selectRole(role){
+ accessRole=role;
+ const sf=document.getElementById("studentLoginForm"), af=document.getElementById("adminLoginForm");
+ const sbt=document.getElementById("studentRoleBtn"), abt=document.getElementById("adminRoleBtn");
+ const isStudent=role==="student";
+ sf.classList.toggle("hidden",!isStudent); af.classList.toggle("hidden",isStudent);
+ sbt.classList.toggle("active",isStudent); abt.classList.toggle("active",!isStudent);
+ document.getElementById("studentLoginMsg").textContent="";
+ document.getElementById("adminLoginMsg").innerHTML="";
+}
+document.getElementById("studentRoleBtn").addEventListener("click",()=>selectRole("student"));
+document.getElementById("adminRoleBtn").addEventListener("click",()=>selectRole("admin"));
+selectRole("student");
+
+function setPublicLocked(locked){document.getElementById("studentLoginModal").classList.toggle("hidden",!locked)}
+function studentMessage(text){document.getElementById("studentLoginMsg").textContent=text}
+async function studentLogin(){
+ const btn=document.getElementById("studentLoginBtn"),u=document.getElementById("studentUsername").value.trim(),p=document.getElementById("studentPassword").value;
+ if(!u||!p){studentMessage("Completa usuario y contraseña.");return}
+ btn.disabled=true;btn.textContent="Verificando...";studentMessage("");
+ try{
+  const {data,error}=await db.rpc("student_login",{p_username:u,p_password:p});
+  if(error||!data)throw new Error("invalid");
+  studentSession=Array.isArray(data)?data[0]?.token:data?.token||data;
+  if(!studentSession)throw new Error("invalid");
+  sessionStorage.setItem("student_session",studentSession);
+  setPublicLocked(false);
+  document.getElementById("studentUsername").value="";document.getElementById("studentPassword").value="";
+  if(!localStorage.getItem("rulesAccepted"))openRules();
+ }catch(e){studentMessage("Usuario o contraseña incorrectos.")}finally{btn.disabled=false;btn.textContent="Iniciar sesión"}
+}
+async function ensureStudentSession(){
+ if(!studentSession){setPublicLocked(true);return false}
+ const {data,error}=await db.rpc("student_is_valid",{p_token:studentSession});
+ if(error||data!==true){sessionStorage.removeItem("student_session");studentSession=null;setPublicLocked(true);return false}
+ setPublicLocked(false);return true
+}
+async function studentLogout(){
+ if(studentSession)await db.rpc("student_logout",{p_token:studentSession});
+ sessionStorage.removeItem("student_session");studentSession=null;setPublicLocked(true);
+}
+
+const badWords=["puta","puto","mierda","verga","cabron","cabrón","pendejo","pendeja","idiota","imbecil","imbécil","estupido","estúpido","estupida","estúpida","maricon","maricón","marica","cojudo","cojuda","culero","culera","joder","chingar","chinga","zorra","perra","gilipollas"];
+const emojiRegex=/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/u;
+let petitions=[],votes=JSON.parse(localStorage.getItem("buzon_votes")||"{}");
+const clientToken=localStorage.getItem("buzon_client_token")||crypto.randomUUID();localStorage.setItem("buzon_client_token",clientToken);
+function hasEmoji(s){return emojiRegex.test(s)}
+function countWords(t){return t.trim()?t.trim().split(/\s+/).length:0}
+function normalize(s){return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")}
+function hasBadLanguage(s){const n=normalize(s);return badWords.some(w=>new RegExp("\\b"+normalize(w)+"\\b","i").test(n))}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]))}
+function scrollToId(id){document.getElementById(id).scrollIntoView({behavior:"smooth"})}
+function openRules(){document.getElementById("rulesModal").classList.remove("hidden")}
+document.getElementById("acceptRules").onclick=()=>{const b=document.getElementById("acceptRules");b.disabled=true;b.textContent="Aceptado";localStorage.setItem("rulesAccepted","1");setTimeout(()=>document.getElementById("rulesModal").classList.add("hidden"),250)}
+if(localStorage.getItem("rulesAccepted"))document.getElementById("rulesModal").classList.add("hidden");
+document.getElementById("message").addEventListener("input",e=>{const w=countWords(e.target.value);document.getElementById("wordCount").textContent=w;if(w>500){e.target.value=e.target.value.trim().split(/\s+/).slice(0,500).join(" ");document.getElementById("wordCount").textContent=500}});
+async function loadAnnouncements(){
+ const el=document.getElementById("announcementsList");
+ if(!el)return;
+ const {data,error}=await db.from("announcements").select("title,content,created_at").eq("published",true).order("created_at",{ascending:false});
+ if(error){el.innerHTML='<div class="empty">No se pudieron cargar los anuncios.</div>';return}
+ if(!data||!data.length){el.innerHTML='<div class="empty">No hay anuncios publicados.</div>';return}
+ el.innerHTML=data.map(a=>`<article class="petition"><h3>${escapeHtml(a.title)}</h3><p>${escapeHtml(a.content)}</p><div class="meta">Administración · ${new Date(a.created_at).toLocaleString("es-EC")}</div></article>`).join("");
+}
+async function loadPetitions(){
+ const {data,error}=await db.from("petitions").select("id,title,category,message,created_at,tracking_code,status,ratings(score,client_token),comments(id,message,created_at)");
+ if(error){document.getElementById("list").innerHTML='<div class="empty">No se pudieron cargar las publicaciones. Revisa la conexión.</div>';return}
+ petitions=(data||[]).map(p=>({id:p.id,title:p.title,category:p.category,message:p.message,date:p.created_at,code:p.tracking_code,status:p.status||"Recibida",ratings:(p.ratings||[]).reduce((a,r)=>a+r.score,0),count:(p.ratings||[]).length,comments:p.comments||[]})); render();
+}
+async function submitPetition(){
+ if(!(await ensureStudentSession()))return;
+ const title=document.getElementById("title").value.trim(),cat=document.getElementById("category").value,msg=document.getElementById("message").value.trim(),err=document.getElementById("formError"),btn=document.querySelector(".send");err.textContent="";
+ if(!title||!msg){err.textContent="Completa el título y el mensaje.";return}
+ if(countWords(msg)>500){err.textContent="El mensaje supera las 500 palabras.";return}
+ if(hasEmoji(title+" "+msg)){err.textContent="No se permiten emojis.";return}
+ if(hasBadLanguage(title+" "+msg)){err.textContent="Revisa el lenguaje. Mantengamos un espacio respetuoso.";return}
+ btn.disabled=true;btn.textContent="Enviando...";
+ try{
+  const {data,error}=await db.rpc("submit_petition",{p_student_token:studentSession,p_client_token:clientToken,p_title:title,p_category:cat,p_message:msg});
+  if(error)throw error;
+  const row=Array.isArray(data)?data[0]:data;
+  if(!row||!row.tracking_code)throw new Error("No se recibió el código de seguimiento.");
+  document.getElementById("title").value="";document.getElementById("message").value="";document.getElementById("wordCount").textContent="0";
+  err.className="error";err.style.color="#176b52";err.textContent="Enviado correctamente. Código: "+row.tracking_code;
+  await loadPetitions();scrollToId("publicaciones");
+ }catch(e){
+  console.error(e);let text="No se pudo enviar. Inténtalo nuevamente.";
+  if((e.message||"").includes("2 submissions"))text="Ya alcanzaste el máximo de 2 peticiones por hoy.";
+  else if((e.message||"").includes("500 words"))text="El mensaje supera las 500 palabras.";
+  else if((e.message||"").toLowerCase().includes("emoji"))text="No se permiten emojis.";
+  else if((e.message||"").toLowerCase().includes("prohibited"))text="El mensaje contiene lenguaje no permitido.";
+  err.textContent=text;
+ }finally{btn.disabled=false;btn.textContent="Enviar";}
+}
+async function rate(id,value){
+ if(!(await ensureStudentSession()))return;
+ if(votes[String(id)]){alert("Ya calificaste esta petición desde este dispositivo.");return}
+ const buttons=[...document.querySelectorAll(`button[onclick^="rate(${id},"]`)];buttons.forEach(b=>b.disabled=true);
+ try{
+  const {data,error}=await db.rpc("submit_rating",{p_student_token:studentSession,p_client_token:clientToken,p_petition_id:id,p_score:value});
+  if(error)throw error;
+  if(data!==true){alert("Ya calificaste esta petición desde este dispositivo.");return}
+  votes[String(id)]=value;localStorage.setItem("buzon_votes",JSON.stringify(votes));await loadPetitions();
+ }catch(e){console.error(e);alert("No se pudo registrar la calificación.");buttons.forEach(b=>b.disabled=false)}
+}
+async function trackPetition(){const code=document.getElementById("trackCode").value.trim().toUpperCase(),out=document.getElementById("trackResult");if(!/^PFHD-\d{7}$/.test(code)){out.textContent="Usa un código con el formato PFHD-0000001.";return}const {data,error}=await db.from("petitions").select("title,status,tracking_code").eq("tracking_code",code).single();if(error||!data){out.textContent="No encontramos una petición con ese código.";return}out.innerHTML=`<b>${escapeHtml(data.tracking_code)}</b><br>${escapeHtml(data.title)}<br>Estado: <b>${escapeHtml(data.status||"Recibida")}</b>`;}
+function render(){
+ const list=document.getElementById("list"),sort=document.getElementById("sort").value,filter=document.getElementById("filter").value;
+ let arr=petitions.filter(p=>filter==="all"||p.category===filter);
+ arr.sort((a,b)=>sort==="new"?new Date(b.date)-new Date(a.date):(b.count?b.ratings/b.count:0)-(a.count?a.ratings/a.count:0)||b.count-a.count);
+ if(!arr.length){list.innerHTML='<div class="empty">Todavía no hay publicaciones en esta categoría.</div>';return}
+ list.innerHTML=arr.map(p=>{const avg=p.count?p.ratings/p.count:0;const stars=[1,2,3,4,5].map(i=>`<button class="star ${i<=Math.round(avg)?"active":""}" onclick="rate(${p.id},${i})">★</button>`).join("");const comments=(p.comments||[]).map(c=>`<div class="comment"><b>Administrador</b><span>${new Date(c.created_at).toLocaleDateString("es-EC")}</span><p>${escapeHtml(c.message)}</p></div>`).join("");return `<article class="petition"><div class="petition-top"><span class="tag">${escapeHtml(p.category)}</span><span class="meta">Anónimo · ${new Date(p.date).toLocaleDateString("es-EC")}</span></div><div class="meta" style="margin-top:8px"><b>${escapeHtml(p.code||"Sin código")}</b> · Estado: <b>${escapeHtml(p.status)}</b></div><h3>${escapeHtml(p.title)}</h3><p>${escapeHtml(p.message)}</p><div class="rating"><div class="stars">${stars}</div><span class="score">${avg.toFixed(1)} · ${p.count} valoración${p.count===1?"":"es"}</span></div>${comments?`<div class="comments"><h4>Respuesta de Administración</h4>${comments}</div>`:""}</article>`}).join("");
+}
+ensureStudentSession().then(()=>{loadAnnouncements();loadPetitions()});
+async function logout(){return adminLogout()}
+</script><div class="hidden" id="adminArea"><main class="hidden" id="panel">
+<div class="card top"><div><h2 style="margin:0">Administración</h2><p class="meta">Gestiona peticiones, respuestas y anuncios.</p></div><button class="danger" onclick="logout()">Cerrar sesión</button></div>
+<div class="card"><h2>Resumen</h2><div class="stats" id="stats"></div></div>
+<div class="card"><h2>Publicar anuncio</h2><label for="annTitle">Título</label><input id="annTitle" maxlength="150" placeholder="Ejemplo: Reunión estudiantil"/>
+<label for="annContent">Contenido</label><textarea id="annContent" maxlength="3000" placeholder="Escribe el anuncio..."></textarea>
+<button class="primary" onclick="createAnnouncement()" style="margin-top:12px">Publicar anuncio</button><div id="annMsg"></div></div>
+<div class="card"><h2>Anuncios publicados</h2><div id="announcements"></div></div>
+<div class="card"><h2>Peticiones</h2><div id="petitions">Cargando...</div></div>
+</main></div>
+<script>
+document.getElementById("studentRoleBtn").onclick=()=>{
+ document.getElementById("studentRoleBtn").classList.add("active");
+ document.getElementById("adminRoleBtn").classList.remove("active");
+ document.getElementById("studentLoginForm").classList.remove("hidden");
+ document.getElementById("adminLoginForm").classList.add("hidden");
+};
+document.getElementById("adminRoleBtn").onclick=()=>{
+ document.getElementById("adminRoleBtn").classList.add("active");
+ document.getElementById("studentRoleBtn").classList.remove("active");
+ document.getElementById("adminLoginForm").classList.remove("hidden");
+ document.getElementById("studentLoginForm").classList.add("hidden");
+};
+document.getElementById("studentRoleBtn").click();
+</script><script>function adminMsg(id,text,ok=false){const el=document.getElementById(id);if(el)el.innerHTML=`<div class="notice ${ok?"ok":"err"}">${esc(text)}</div>`}
+
+const sb=db;
+let token=sessionStorage.getItem("admin_session");
+const esc=t=>{const d=document.createElement("div");d.textContent=t??"";return d.innerHTML};
+function msg(id,text,ok=false){document.getElementById(id).innerHTML=`<div class="notice ${ok?'ok':'err'}">${esc(text)}</div>`}
+async function adminLogin(){
+ const button=document.getElementById("adminLoginBtn");
+ const u=document.getElementById("adminUsername").value.trim();
+ const p=document.getElementById("adminPassword").value;
+ if(!u||!p){adminMsg("adminLoginMsg","Completa usuario y contraseña.");return}
+ button.disabled=true;button.textContent="Verificando...";
+ adminMsg("adminLoginMsg","");
+ try{
+  const {data,error}=await sb.rpc("admin_login",{p_username:u,p_password:p});
+  if(error) throw error;
+  token=Array.isArray(data)?data[0]?.token:data?.token||data;
+  if(!token) throw new Error("Credenciales inválidas");
+  const {data:ok,error:validError}=await sb.rpc("admin_is_valid",{p_token:token});
+  if(validError||ok!==true) throw new Error("Sesión no válida");
+  sessionStorage.setItem("admin_session",token);
+  document.getElementById("studentLoginModal").classList.add("hidden");
+  document.getElementById("adminArea").classList.remove("hidden");
+  document.getElementById("panel").classList.remove("hidden");
+  await loadAll();
+ }catch(e){
+  console.error("Admin login:",e);
+  token=null;sessionStorage.removeItem("admin_session");
+  adminMsg("adminLoginMsg","No se pudo iniciar sesión. Verifica el usuario y la contraseña.");
+ }finally{
+  button.disabled=false;button.textContent="Entrar al panel";
+ }
+}
+async function valid(){if(!token)return false;const {data,error}=await sb.rpc("admin_is_valid",{p_token:token});return !error && data===true}
+async function adminLogout(){if(token)await sb.rpc("admin_logout",{p_token:token});sessionStorage.removeItem("admin_session");location.reload()}
+async function loadAll(){if(!(await valid())){sessionStorage.removeItem("admin_session");location.reload();return}loadStats();adminLoadAnnouncements();adminLoadPetitions()}
+async function loadStats(){const {data}=await sb.from("petitions").select("status");const a=data||[];const statuses=['Recibida','En revisión','En proceso','Resuelta','No aprobada'];document.getElementById("stats").innerHTML=statuses.map(s=>`<div class="stat"><b>${a.filter(x=>x.status===s).length}</b>${s}</div>`).join("")}
+async function adminLoadAnnouncements(){const {data,error}=await sb.from("announcements").select("*").order("created_at",{ascending:false});const el=document.getElementById("announcements");if(error){el.innerHTML='<p class="meta">No se pudieron cargar los anuncios.</p>';return}if(!data.length){el.innerHTML='<p class="meta">No hay anuncios todavía.</p>';return}el.innerHTML=data.map(a=>`<div class="announcement"><strong>${esc(a.title)}</strong><p>${esc(a.content).replace(/\n/g,"<br>")}</p><span class="meta">${new Date(a.created_at).toLocaleString()}</span><div class="actions"><button class="danger" onclick="deleteAnnouncement(${a.id})">Eliminar</button></div></div>`).join("")}
+async function createAnnouncement(){const button=[...document.querySelectorAll("button.primary")].find(b=>b.textContent.trim()==="Publicar anuncio");const title=document.getElementById("annTitle").value.trim(),content=document.getElementById("annContent").value.trim();if(!title||!content){msg("annMsg","Completa título y contenido.");return}button.disabled=true;button.textContent="Publicando...";const {data,error}=await sb.rpc("admin_create_announcement",{p_token:token,p_title:title,p_content:content,p_published:true});if(error||!data){msg("annMsg","No se pudo publicar el anuncio.");button.disabled=false;button.textContent="Publicar anuncio";return}document.getElementById("annTitle").value="";document.getElementById("annContent").value="";msg("annMsg","Anuncio publicado correctamente.",true);button.disabled=false;button.textContent="Publicar anuncio";adminLoadAnnouncements()}
+async function deleteAnnouncement(id){if(!confirm("¿Eliminar este anuncio?"))return;const {data,error}=await sb.rpc("admin_delete_announcement",{p_token:token,p_id:id});if(error||!data){alert("No se pudo eliminar el anuncio.");return}adminLoadAnnouncements()}
+async function adminLoadPetitions(){const {data,error}=await sb.from("petitions").select("*").order("created_at",{ascending:false});const el=document.getElementById("petitions");if(error){el.textContent="No se pudieron cargar las peticiones.";return}if(!data.length){el.innerHTML='<p class="meta">No hay peticiones.</p>';return}const {data:comments}=await sb.from("comments").select("petition_id,message,created_at").order("created_at",{ascending:true});const cm={};(comments||[]).forEach(c=>(cm[c.petition_id]??=[]).push(c));el.innerHTML=data.map(p=>`<article class="petition"><span class="code">${esc(p.tracking_code)}</span><h3>${esc(p.title)}</h3><p class="meta">${esc(p.category)} · ${new Date(p.created_at).toLocaleString()}</p><p>${esc(p.message).replace(/\n/g,"<br>")}</p><label>Estado</label><select id="status-${p.id}">${['Recibida','En revisión','En proceso','Resuelta','No aprobada'].map(s=>`<option ${s===p.status?'selected':''}>${s}</option>`).join('')}</select><div class="actions"><button class="primary" onclick="acceptPetition(${p.id})">Aceptar petición</button><button class="secondary" onclick="updateStatus(${p.id})">Guardar estado</button></div><div id="status-msg-${p.id}"></div><label>Respuesta de administración</label><textarea id="comment-${p.id}" maxlength="3000" placeholder="Escribe una respuesta oficial..."></textarea><div class="actions"><button class="primary" onclick="addComment(${p.id})">Publicar respuesta</button></div>${(cm[p.id]||[]).map(c=>`<div class="announcement"><strong>Administración</strong><p>${esc(c.message).replace(/\n/g,"<br>")}</p><span class="meta">${new Date(c.created_at).toLocaleString()}</span></div>`).join('')}</article>`).join("")}
+async function updateStatus(id){const button=[...document.querySelectorAll(`button[onclick="updateStatus(${id})"]`)][0],status=document.getElementById(`status-${id}`).value;button.disabled=true;button.textContent="Guardando...";const {data,error}=await sb.rpc("admin_update_petition",{p_token:token,p_petition_id:id,p_status:status});if(error||!data){alert("No se pudo actualizar el estado.");button.disabled=false;button.textContent="Guardar estado";return}button.textContent="Guardado";setTimeout(()=>{button.disabled=false;button.textContent="Guardar estado"},900);loadStats();adminLoadPetitions()}
+async function acceptPetition(id){const button=[...document.querySelectorAll(`button[onclick="acceptPetition(${id})"]`)][0];button.disabled=true;button.textContent="Aceptando...";const {data,error}=await sb.rpc("admin_update_petition",{p_token:token,p_petition_id:id,p_status:"En revisión"});if(error||!data){button.disabled=false;button.textContent="Aceptar petición";alert("No se pudo aceptar la petición.");return}button.textContent="Petición aceptada";const m=document.getElementById(`status-msg-${id}`);if(m)m.innerHTML='<div class="notice ok">La petición fue aceptada y pasó a revisión.</div>';loadStats();setTimeout(adminLoadPetitions,500)}
+async function addComment(id){const button=[...document.querySelectorAll(`button[onclick="addComment(${id})"]`)][0],box=document.getElementById(`comment-${id}`),message=box.value.trim();if(!message)return;button.disabled=true;button.textContent="Publicando...";const {data,error}=await sb.rpc("admin_add_comment",{p_token:token,p_petition_id:id,p_message:message});if(error||!data){alert("No se pudo publicar la respuesta.");button.disabled=false;button.textContent="Publicar respuesta";return}box.value="";adminLoadPetitions()}
+if(token){
+ db.rpc("admin_is_valid",{p_token:token}).then(({data,error})=>{
+   if(!error&&data===true){document.getElementById("studentLoginModal").classList.add("hidden");document.getElementById("adminArea").classList.remove("hidden");document.getElementById("panel").classList.remove("hidden");loadAll()}
+   else {sessionStorage.removeItem("admin_session");token=null;}
+ });
+}
+
+<script>
+document.getElementById("studentPassword").addEventListener("keydown",e=>{if(e.key==="Enter")studentLogin()});
+document.getElementById("adminPassword").addEventListener("keydown",e=>{if(e.key==="Enter")adminLogin()});
+</script></body>
+</html>
